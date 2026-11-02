@@ -1,0 +1,36 @@
+{% extends "tracker/base.html" %}
+{% block title %}Your classes - Rollcall{% endblock %}
+
+{% block content %}
+<h1>Your classes</h1>
+
+{% if rows %}
+<ul class="rows">
+  {% for r in rows %}
+  <li class="row">
+    <a class="row-link" href="{% url 'student_class' r.id %}">
+      <span class="row-main">
+        <span class="row-title">{{ r.name }}</span>
+        <span class="row-sub">
+          {% if r.s.rate is not None %}{{ r.s.rate }}% attendance{% if r.latest %}, latest roll call {{ r.latest.short }}: {{ r.latest.word }}{% endif %}{% else %}No roll calls yet{% endif %}
+        </span>
+      </span>
+      <svg class="ico chev" aria-hidden="true"><use href="#i-next"/></svg>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="lede">You haven't joined a class yet. Ask your teacher for the class code, then enter it below.</p>
+{% endif %}
+
+<form method="post" class="stack add">
+  {% csrf_token %}
+  <label for="code">Class code</label>
+  <div class="inline">
+    <input id="code" name="code" type="text" class="code-input" maxlength="12" autocomplete="off" autocapitalize="characters" placeholder="e.g. K7M2QX" required>
+    <button class="btn" type="submit">Join class</button>
+  </div>
+  {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+</form>
+{% endblock %}

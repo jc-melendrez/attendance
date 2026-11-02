@@ -1,0 +1,36 @@
+{% extends "tracker/base.html" %}
+{% block title %}Your classes - Rollcall{% endblock %}
+
+{% block content %}
+<h1>Your classes</h1>
+
+{% if classes %}
+  <ul class="rows">
+    {% for c in classes %}
+    <li class="row">
+      <a class="row-link" href="{% url 'class_detail' c.id %}">
+        <span class="row-main">
+          <span class="row-title">{{ c.name }}</span>
+          <span class="row-sub">
+            {{ c.student_count }} student{{ c.student_count|pluralize }}{% if c.last_label %}, last roll call {{ c.last_label }}{% else %}, no roll calls yet{% endif %}
+          </span>
+        </span>
+        <svg class="ico chev" aria-hidden="true"><use href="#i-next"/></svg>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="lede">No classes yet. Name your first class to start taking roll.</p>
+{% endif %}
+
+<form method="post" class="stack add">
+  {% csrf_token %}
+  <label for="name">New class</label>
+  <div class="inline">
+    <input id="name" name="name" type="text" maxlength="80" placeholder="e.g. Biology, Period 3" required>
+    <button class="btn" type="submit">Add class</button>
+  </div>
+  {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+</form>
+{% endblock %}

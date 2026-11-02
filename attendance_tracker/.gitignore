@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+# Never commit your Firebase service account key
+*.json
+!package.json
+env/

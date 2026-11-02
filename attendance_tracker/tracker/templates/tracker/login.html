@@ -1,0 +1,17 @@
+{% extends "tracker/base.html" %}
+{% block title %}Log in - Rollcall{% endblock %}
+
+{% block content %}
+<div class="auth">
+  <h1>Log in</h1>
+  <form method="post" class="stack" novalidate>
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    {% include "tracker/_field.html" with id="username" label="Username" value=username autocomplete="username" maxlength="30" required=True %}
+    {% include "tracker/_field.html" with id="password" label="Password" type="password" autocomplete="current-password" required=True %}
+    {% if error %}<p class="error form-error" role="alert">{{ error }}</p>{% endif %}
+    <button class="btn-primary wide" type="submit">Log in</button>
+  </form>
+  <p class="switch">New here? <a class="textlink" href="{% url 'signup' %}">Create an account</a></p>
+</div>
+{% endblock %}

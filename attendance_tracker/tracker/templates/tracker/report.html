@@ -1,0 +1,48 @@
+{% extends "tracker/base.html" %}
+{% block title %}Report - {{ klass.name }}{% endblock %}
+
+{% block content %}
+<a class="back" href="{% url 'class_detail' klass.id %}"><svg class="ico" aria-hidden="true"><use href="#i-back"/></svg>{{ klass.name }}</a>
+<h1>Attendance report</h1>
+
+{% if session_count %}
+<p class="meta">Based on {{ session_count }} roll call{{ session_count|pluralize }}. Lowest attendance is listed first. Late counts as attending.</p>
+
+<p class="legend key-row">
+  <span class="key present"><svg class="ico" aria-hidden="true"><use href="#i-present"/></svg>Present</span>
+  <span class="key late"><svg class="ico" aria-hidden="true"><use href="#i-late"/></svg>Late</span>
+  <span class="key absent"><svg class="ico" aria-hidden="true"><use href="#i-absent"/></svg>Absent</span>
+  <span class="key none"><svg class="ico" aria-hidden="true"><use href="#i-empty"/></svg>Not marked</span>
+</p>
+
+<ul class="rows report">
+  {% for r in rows %}
+  <li class="row report-row">
+    <div class="report-who">
+      <span class="row-title">{{ r.name }}</span>
+      <span class="row-sub">{{ r.present }} present, {{ r.late }} late, {{ r.absent }} absent</span>
+    </div>
+    <div class="report-rate">
+      {% if r.rate is not None %}
+        <span class="rate">{{ r.rate }}%</span>
+        <span class="meter" role="img" aria-label="Attendance {{ r.rate }} percent"><span class="meter-fill{% if r.rate < 80 %} low{% endif %}" style="width:{{ r.rate }}%"></span></span>
+      {% else %}
+        <span class="muted">No data</span>
+      {% endif %}
+    </div>
+    <div class="strip" aria-label="Last {{ r.strip|length }} roll calls, oldest to newest">
+      {% for c in r.strip %}
+      <span class="cell {% if c.state %}{{ c.state }}{% else %}none{% endif %}" title="{{ c.title }}">
+        <svg class="ico" aria-hidden="true"><use href="#i-{% if c.state %}{{ c.state }}{% else %}empty{% endif %}"/></svg>
+        <span class="sr">{{ c.title }}</span>
+      </span>
+      {% endfor %}
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+<p class="muted">Boxes run from oldest to newest, left to right.</p>
+{% else %}
+<p class="lede">No roll calls saved yet. Take your first one and the report will fill in.</p>
+{% endif %}
+{% endblock %}

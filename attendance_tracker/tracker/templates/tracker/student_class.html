@@ -1,0 +1,41 @@
+{% extends "tracker/base.html" %}
+{% block title %}{{ klass.name }} - Rollcall{% endblock %}
+
+{% block content %}
+<a class="back" href="{% url 'student_home' %}"><svg class="ico" aria-hidden="true"><use href="#i-back"/></svg>All classes</a>
+<h1>{{ klass.name }}</h1>
+
+{% if s.rate is not None %}
+  <p class="rate-big{% if s.rate < 80 %} low{% endif %}">{{ s.rate }}%</p>
+  <p class="meta">Your attendance across {{ s.recorded }} roll call{{ s.recorded|pluralize }}. Late counts as attending.</p>
+
+  <div class="split big" role="img" aria-label="{{ s.counts.present }} present, {{ s.counts.late }} late, {{ s.counts.absent }} absent">
+    <span class="seg present" style="flex-grow:{{ s.counts.present }}"></span>
+    <span class="seg late" style="flex-grow:{{ s.counts.late }}"></span>
+    <span class="seg absent" style="flex-grow:{{ s.counts.absent }}"></span>
+  </div>
+  <p class="legend">
+    <span class="key present">{{ s.counts.present }} Present</span>
+    <span class="key late">{{ s.counts.late }} Late</span>
+    <span class="key absent">{{ s.counts.absent }} Absent</span>
+  </p>
+{% else %}
+  <p class="lede">No roll calls yet. Your attendance will show here after your teacher takes roll.</p>
+{% endif %}
+
+{% if s.history %}
+<section class="block" aria-labelledby="hist-h">
+  <h2 id="hist-h">Roll call history</h2>
+  <ul class="rows">
+    {% for h in s.history %}
+    <li class="row hist">
+      <span class="hist-day">{{ h.label }}</span>
+      <span class="status {% if h.state %}{{ h.state }}{% else %}none{% endif %}">
+        <svg class="ico" aria-hidden="true"><use href="#i-{% if h.state %}{{ h.state }}{% else %}empty{% endif %}"/></svg>{{ h.word }}
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}

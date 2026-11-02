@@ -1,0 +1,41 @@
+{% extends "tracker/base.html" %}
+{% block title %}Create an account - Rollcall{% endblock %}
+
+{% block content %}
+<div class="auth">
+  <h1>Create your account</h1>
+  <form method="post" class="stack signup" novalidate>
+    {% csrf_token %}
+
+    <fieldset class="choices">
+      <legend>I am a</legend>
+      <label class="choice">
+        <input type="radio" name="role" id="role-student" value="student"{% if form.role != "teacher" %} checked{% endif %}>
+        <span class="choice-body">
+          <svg class="ico" aria-hidden="true"><use href="#i-present"/></svg>
+          <span class="choice-title">Student</span>
+          <span class="choice-sub">Join a class and see your own attendance</span>
+        </span>
+      </label>
+      <label class="choice">
+        <input type="radio" name="role" id="role-teacher" value="teacher"{% if form.role == "teacher" %} checked{% endif %}>
+        <span class="choice-body">
+          <svg class="ico" aria-hidden="true"><use href="#i-present"/></svg>
+          <span class="choice-title">Teacher</span>
+          <span class="choice-sub">Create classes and take roll</span>
+        </span>
+      </label>
+    </fieldset>
+
+    {% include "tracker/_field.html" with id="name" label="Your name" value=form.name error=errors.name autocomplete="name" maxlength="60" required=True %}
+    {% include "tracker/_field.html" with id="username" label="Username" value=form.username error=errors.username autocomplete="username" maxlength="30" hint="Letters, numbers, dots, dashes or underscores." required=True %}
+    {% include "tracker/_field.html" with id="password" label="Password" type="password" error=errors.password autocomplete="new-password" hint="At least 8 characters." required=True %}
+    <div class="teacher-only">
+      {% include "tracker/_field.html" with id="teacher_code" label="Teacher code" type="password" error=errors.teacher_code autocomplete="off" hint="Ask the person who set up this site. Students don't need one." %}
+    </div>
+
+    <button class="btn-primary wide" type="submit">Create account</button>
+  </form>
+  <p class="switch">Already have an account? <a class="textlink" href="{% url 'login' %}">Log in</a></p>
+</div>
+{% endblock %}

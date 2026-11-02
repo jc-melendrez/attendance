@@ -1,0 +1,33 @@
+{% extends "tracker/base.html" %}
+{% block title %}Saved - {{ klass.name }}{% endblock %}
+
+{% block content %}
+<div class="done">
+  <p class="stamp">Saved</p>
+  <h1 class="done-title">{{ here }} of {{ total }} here</h1>
+  <p class="meta">{{ klass.name }}, {{ day_label }}</p>
+
+  <div class="split big" role="img" aria-label="{{ t.present }} present, {{ t.late }} late, {{ t.absent }} absent">
+    <span class="seg present" style="flex-grow:{{ t.present }}"></span>
+    <span class="seg late" style="flex-grow:{{ t.late }}"></span>
+    <span class="seg absent" style="flex-grow:{{ t.absent }}"></span>
+  </div>
+  <p class="legend">
+    <span class="key present">{{ t.present }} Present</span>
+    <span class="key late">{{ t.late }} Late</span>
+    <span class="key absent">{{ t.absent }} Absent</span>
+  </p>
+
+  {% if absent_names %}
+  <p class="absent-list"><strong>Absent:</strong> {{ absent_names|join:", " }}</p>
+  {% endif %}
+  {% if unmarked %}
+  <p class="muted">{{ unmarked }} student{{ unmarked|pluralize }} not marked. <a class="textlink" href="{% url 'roll_call' klass.id day_iso %}">Go back and mark them</a></p>
+  {% endif %}
+
+  <div class="actions">
+    <a class="btn-primary" href="{% url 'class_detail' klass.id %}">Back to {{ klass.name }}</a>
+    <a class="btn" href="{% url 'report' klass.id %}">See attendance report</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,5 @@
+<div class="field">
+  <label for="{{ id }}">{{ label }}</label>
+  <input id="{{ id }}" name="{{ name|default:id }}" type="{{ type|default:'text' }}" value="{{ value|default:'' }}"{% if autocomplete %} autocomplete="{{ autocomplete }}"{% endif %}{% if maxlength %} maxlength="{{ maxlength }}"{% endif %}{% if error %} aria-invalid="true"{% endif %} aria-describedby="{{ id }}-note" {% if required %}required{% endif %}>
+  <p class="field-note{% if error %} error{% endif %}" id="{{ id }}-note"{% if error %} role="alert"{% endif %}>{% if error %}{{ error }}{% else %}{{ hint }}{% endif %}</p>
+</div>

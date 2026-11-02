@@ -1,0 +1,59 @@
+{% extends "tracker/base.html" %}
+{% load static %}
+{% block title %}Roll call - {{ klass.name }}{% endblock %}
+{% block body_class %}rollcall{% endblock %}
+
+{% block content %}
+<form method="post" id="roll" data-total="{{ students|length }}">
+  {% csrf_token %}
+
+  <a class="back" href="{% url 'class_detail' klass.id %}"><svg class="ico" aria-hidden="true"><use href="#i-back"/></svg>{{ klass.name }}</a>
+  <h1>Roll call</h1>
+  <p class="meta">{{ day_label }}</p>
+
+  {% if students %}
+  <div class="progress">
+    <div class="rail" aria-hidden="true"><div class="rail-fill" id="rail-fill"></div></div>
+    <div class="progress-row">
+      <p id="progress-text" role="status" aria-live="polite">0 of {{ students|length }} marked</p>
+      <button type="button" class="btn small" id="all-present">Mark the rest present</button>
+    </div>
+  </div>
+
+  <p class="hint">Tap a name to cycle it: present, late, absent, then clear. With a name focused, press P, L or A.</p>
+
+  <div class="tiles">
+    {% for s in students %}
+    <div class="slot">
+      <button type="button" class="tile" data-state="{{ s.mark }}" data-name="{{ s.name }}" aria-label="{{ s.name }}: {{ s.word }}">
+        <span class="tile-name">{{ s.name }}</span>
+        <span class="tile-state">
+          <svg class="ico" aria-hidden="true"><use href="#i-{% if s.mark %}{{ s.mark }}{% else %}empty{% endif %}"/></svg>
+          <span class="tile-word">{{ s.word }}</span>
+        </span>
+      </button>
+      <input type="hidden" name="mark_{{ s.id }}" value="{{ s.mark }}">
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="lede">This class has no students yet. Add some first.</p>
+  {% endif %}
+</form>
+{% endblock %}
+
+{% block after %}
+{% if students %}
+<div class="dock">
+  <div class="wrap dock-in">
+    <p class="tally" aria-hidden="true">
+      <span><b id="n-present">0</b> Present</span>
+      <span><b id="n-late">0</b> Late</span>
+      <span><b id="n-absent">0</b> Absent</span>
+    </p>
+    <button class="btn-save" type="submit" form="roll">Save roll call</button>
+  </div>
+</div>
+<script src="{% static 'tracker/roll.js' %}"></script>
+{% endif %}
+{% endblock %}

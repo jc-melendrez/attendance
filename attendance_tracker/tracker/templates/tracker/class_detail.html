@@ -1,0 +1,81 @@
+{% extends "tracker/base.html" %}
+{% block title %}{{ klass.name }} - Rollcall{% endblock %}
+
+{% block content %}
+<a class="back" href="{% url 'home' %}"><svg class="ico" aria-hidden="true"><use href="#i-back"/></svg>All classes</a>
+<h1>{{ klass.name }}</h1>
+<p class="meta">{{ students|length }} student{{ students|length|pluralize }}</p>
+
+{% if students %}
+  <a class="hero-cta" href="{% url 'roll_today' klass.id %}">
+    <span>
+      <span class="hero-title">{% if today_tally %}Review today's roll call{% else %}Take today's roll call{% endif %}</span>
+      <span class="hero-sub">
+        {% if today_tally %}Saved: {{ today_tally.present }} present, {{ today_tally.late }} late, {{ today_tally.absent }} absent{% else %}{{ today_label }}{% endif %}
+      </span>
+    </span>
+    <svg class="ico chev" aria-hidden="true"><use href="#i-next"/></svg>
+  </a>
+{% else %}
+  <p class="lede">Add your students below, then you can take roll.</p>
+{% endif %}
+
+<section class="block" aria-labelledby="sessions-h">
+  <div class="block-head">
+    <h2 id="sessions-h">Past roll calls</h2>
+    {% if sessions %}<a class="textlink" href="{% url 'report' klass.id %}">See attendance report</a>{% endif %}
+  </div>
+  {% if sessions %}
+  <ul class="rows">
+    {% for s in sessions %}
+    <li class="row">
+      <a class="session" href="{% url 'roll_call' klass.id s.date %}">
+        <span class="session-day">{{ s.label }}</span>
+        <span class="split" role="img" aria-label="{{ s.t.present }} present, {{ s.t.late }} late, {{ s.t.absent }} absent">
+          <span class="seg present" style="flex-grow:{{ s.t.present }}"></span>
+          <span class="seg late" style="flex-grow:{{ s.t.late }}"></span>
+          <span class="seg absent" style="flex-grow:{{ s.t.absent }}"></span>
+        </span>
+        <span class="session-count">{{ s.here }} here</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">Nothing yet. Your saved roll calls will show up here.</p>
+  {% endif %}
+</section>
+
+<section class="block" aria-labelledby="students-h">
+  <div class="block-head"><h2 id="students-h">Students</h2></div>
+
+  {% if klass.join_code %}
+  <div class="code-block">
+    <p class="code-label">Class code</p>
+    <p class="code">{{ klass.join_code }}</p>
+    <p class="muted">Students create an account, then enter this code to join. They only see their own attendance.</p>
+  </div>
+  {% endif %}
+
+  <form method="post" action="{% url 'add_students' klass.id %}" class="stack add">
+    {% csrf_token %}
+    <label for="names">Add students, one name per line</label>
+    <textarea id="names" name="names" rows="4" required></textarea>
+    <button class="btn" type="submit">Add students</button>
+  </form>
+
+  {% if students %}
+  <ul class="rows roster">
+    {% for s in students %}
+    <li class="row roster-row">
+      <span class="roster-name"><span class="row-title">{{ s.name }}</span>{% if s.user_id %}<span class="tag">Has an account</span>{% endif %}</span>
+      <form method="post" action="{% url 'remove_student' klass.id s.id %}" onsubmit="return confirm('Remove {{ s.name|escapejs }} from this class?');">
+        {% csrf_token %}
+        <button class="remove" type="submit">Remove</button>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</section>
+{% endblock %}
